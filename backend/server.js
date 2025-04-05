@@ -28,7 +28,8 @@ const Reservation = require('./models/Reservation');
 const auth = require('./middleware/auth');
 
 app.use('/api/users', require('./routes/users'));
-
+app.use('/api/books', require('./routes/books'));
+app.use('/api/reservations', require('./routes/reservations'));
 
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
