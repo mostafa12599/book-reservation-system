@@ -25,5 +25,10 @@ const User = require('./models/User');
 const Book = require('./models/Book');
 const Reservation = require('./models/Reservation');
 
+const auth = require('./middleware/auth');
+
+app.use('/api/users', require('./routes/users'));
+
+
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
