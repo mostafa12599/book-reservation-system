@@ -69,14 +69,13 @@ router.put('/:id', auth, async (req, res) => {
             return res.status(400).json({ msg: 'Cannot modify a completed reservation' });
         }
 
-        reservation.status = 'cancelled';
-
-        if (reservation.status === 'active') {
-            const book = await Book.findById(reservation.book);
+        if (reservation.status === 'active') {            
+            const book = await Book.findById(reservation.book);            
             book.available += 1;
             await book.save();
         }
 
+        reservation.status = 'cancelled';
         await reservation.save();
         res.json(reservation);
     } catch (err) {

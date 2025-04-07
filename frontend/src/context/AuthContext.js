@@ -18,10 +18,11 @@ export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
   const loadUser = async () => {
-    if (localStorage.token) {
-      setAuthToken(localStorage.token);
+    console.log(localStorage.getItem('token'));
+    
+    if (localStorage.getItem('token')) {
+      setAuthToken(localStorage.getItem('token'));
     }
-
     try {
       const res = await axios.get('/api/users/me');
 
@@ -43,13 +44,14 @@ export const AuthProvider = ({ children }) => {
 
     try {
       const res = await axios.post('/api/users/register', formData, config);
-
+      
+      
       dispatch({
         type: 'REGISTER_SUCCESS',
         payload: res.data
       });
 
-      loadUser();
+      await loadUser();
     } catch (err) {
       dispatch({
         type: 'REGISTER_FAIL',
@@ -67,13 +69,12 @@ export const AuthProvider = ({ children }) => {
 
     try {
       const res = await axios.post('/api/users/login', formData, config);
-
       dispatch({
         type: 'LOGIN_SUCCESS',
         payload: res.data
       });
 
-      loadUser();
+      await loadUser();
     } catch (err) {
       dispatch({
         type: 'LOGIN_FAIL',
