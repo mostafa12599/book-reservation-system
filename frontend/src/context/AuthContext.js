@@ -73,7 +73,7 @@ export const AuthProvider = ({ children }) => {
         type: 'LOGIN_SUCCESS',
         payload: res.data
       });
-
+      await sleep(1000);
       await loadUser();
     } catch (err) {
       dispatch({
@@ -105,4 +105,8 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
+
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
 };
