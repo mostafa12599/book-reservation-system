@@ -1,5 +1,4 @@
-
-name: CI/CD Pipeline
+name: CI/CD for Book Reservation System
 
 on:
   push:
@@ -10,70 +9,60 @@ on:
       - main
 
 jobs:
-  build_and_test:
-    runs-on: macos-latest
+  backend:
+    runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      # Setup Node.js for frontend
-      - name: Set up Node.js (Frontend)
-        uses: actions/setup-node@v2
-        with:
-          node-version: '16'
+    - name: Set up Node.js for backend
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'
 
-      # Install dependencies for frontend
-      - name: Install Dependencies (Frontend)
-        run: |
-          cd frontend
-          npm install
+    - name: Install dependencies for backend
+      run: |
+        cd backend
+        npm install
 
-      # Run frontend tests
-      - name: Run Tests (Frontend)
-        run: |
-          cd frontend
-          npm test -- --ci --reporters=jest-stare
+    - name: Run backend tests
+      run: |
+        cd backend
+        npm test
 
-      # Build frontend
-      - name: Build Frontend
-        run: |
-          cd frontend
-          npm run build
+  frontend:
+    runs-on: ubuntu-latest
 
-      # Setup Node.js for backend
-      - name: Set up Node.js (Backend)
-        uses: actions/setup-node@v2
-        with:
-          node-version: '16'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      # Install dependencies for backend
-      - name: Install Dependencies (Backend)
-        run: |
-          cd backend
-          npm install
+    - name: Set up Node.js for frontend
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'
 
-      # Run backend tests (if you have backend tests, otherwise skip this step)
-      - name: Run Tests (Backend)
-        run: |
-          cd backend
-          npm test -- --ci --reporters=jest-stare
+    - name: Install dependencies for frontend
+      run: |
+        cd frontend
+        npm install
 
-      # Build backend (optional, only if needed for deployment)
-      - name: Build Backend
-        run: |
-          cd backend
-          npm run build
+    - name: Run frontend tests
+      run: |
+        cd frontend
+        npm test -- --ci --reporters=jest-stare
 
-  # Optional deployment job
   deploy:
-    needs: build_and_test
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
+    needs: [frontend, backend]
+    if: success()
+
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      # Setup Node.js (frontend & backend) and deploy as needed
-      - name: Deploy Application
-        run: |
-          echo "Add deployment steps here"
-
+    - name: Deploy to production
+      run: |
+        echo "Deploying the project..."
+        # Add your deployment scripts/commands here (e.g., AWS, Heroku, etc.)
