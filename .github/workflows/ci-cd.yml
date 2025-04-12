@@ -1,7 +1,6 @@
 
 name: CI/CD Pipeline
 
-# Trigger the workflow on push to the main branch or on pull requests
 on:
   push:
     branches:
@@ -11,72 +10,70 @@ on:
       - main
 
 jobs:
-  # Job for Backend
-  backend:
-    runs-on: macos-latest  # Using macOS as per your local setup
+  build_and_test:
+    runs-on: macos-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Set up Node.js (Backend)
-        uses: actions/setup-node@v2
-        with:
-          node-version: '16'  # Use Node.js version 16
-
-      - name: Install Dependencies (Backend)
-        run: |
-          cd backend
-          npm install
-
-      - name: Start Backend (Optional, for debugging)
-        run: |
-          cd backend
-          npm run server  # This will start your backend server (not for production, only for testing)
-
-  # Job for Frontend
-  frontend:
-    runs-on: macos-latest  # Using macOS as per your local setup
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-
+      # Setup Node.js for frontend
       - name: Set up Node.js (Frontend)
         uses: actions/setup-node@v2
         with:
-          node-version: '16'  # Use Node.js version 16
+          node-version: '16'
 
+      # Install dependencies for frontend
       - name: Install Dependencies (Frontend)
         run: |
           cd frontend
           npm install
 
+      # Run frontend tests
       - name: Run Tests (Frontend)
         run: |
           cd frontend
-          npm test  # This will run frontend tests with React Testing Library
+          npm test -- --ci --reporters=jest-stare
 
+      # Build frontend
       - name: Build Frontend
         run: |
           cd frontend
-          npm run build  # Builds the React app for production
+          npm run build
 
-  # Deployment (Optional)
+      # Setup Node.js for backend
+      - name: Set up Node.js (Backend)
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      # Install dependencies for backend
+      - name: Install Dependencies (Backend)
+        run: |
+          cd backend
+          npm install
+
+      # Run backend tests (if you have backend tests, otherwise skip this step)
+      - name: Run Tests (Backend)
+        run: |
+          cd backend
+          npm test -- --ci --reporters=jest-stare
+
+      # Build backend (optional, only if needed for deployment)
+      - name: Build Backend
+        run: |
+          cd backend
+          npm run build
+
+  # Optional deployment job
   deploy:
-    runs-on: macos-latest  # For deploying locally or to cloud
-    needs: [frontend, backend]  # Ensure both frontend and backend are built first
+    needs: build_and_test
+    runs-on: macos-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Deploy Backend (Optional)
+      # Setup Node.js (frontend & backend) and deploy as needed
+      - name: Deploy Application
         run: |
-          cd backend
-          # Here you could deploy to a cloud service, or perform additional deployment steps
-          echo "Deploying Backend..."
-      
-      - name: Deploy Frontend (Optional)
-        run: |
-          cd client
-          # Similarly, deploy the React app to your desired platform
-          echo "Deploying Frontend..."
+          echo "Add deployment steps here"
 
