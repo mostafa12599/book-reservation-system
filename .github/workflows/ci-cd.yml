@@ -1,0 +1,48 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      mongo:
+        image: mongo:latest
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd="mongo --eval 'db.runCommand({ ping: 1 })'" 
+          --health-interval=10s 
+          --health-timeout=5s 
+          --health-retries=5
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install backend dependencies
+      working-directory: ./server
+      run: npm install
+
+    - name: Install frontend dependencies
+      working-directory: ./client
+      run: npm install
+
+    - name: Build frontend
+      working-directory: ./client
+      run: npm run build
+
+    - name:  Backend Test
+      working-directory: ./server
+      run: echo "Add tests here later"
+
