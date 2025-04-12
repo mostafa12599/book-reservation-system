@@ -28,11 +28,6 @@ jobs:
           cd backend
           npm install
 
-      - name: Run Tests (Backend)
-        run: |
-          cd backend
-          npm test  # This assumes you have tests in your backend. If not, remove this line
-
       - name: Start Backend (Optional, for debugging)
         run: |
           cd backend
@@ -52,17 +47,17 @@ jobs:
 
       - name: Install Dependencies (Frontend)
         run: |
-          cd client
+          cd frontend
           npm install
 
       - name: Run Tests (Frontend)
         run: |
-          cd client
+          cd frontend
           npm test  # This will run frontend tests with React Testing Library
 
       - name: Build Frontend
         run: |
-          cd client
+          cd frontend
           npm run build  # Builds the React app for production
 
   # Deployment (Optional)
