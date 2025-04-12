@@ -1,55 +1,87 @@
 
-name: Fullstack CI Pipeline
+name: CI/CD Pipeline
 
+# Trigger the workflow on push to the main branch or on pull requests
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
-
-    services:
-      mongo:
-        image: mongo:latest
-        ports:
-          - 27017:27017
-        options: >-
-          --health-cmd "mongo --eval 'db.runCommand({ ping: 1 })'"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    env:
-      MONGO_URI: mongodb://localhost:27017/book-reservation
-      JWT_SECRET: dummy_jwt_secret
-      PORT: 5000
-
+  # Job for Backend
+  backend:
+    runs-on: macos-latest  # Using macOS as per your local setup
     steps:
-      - name: 📥 Checkout Code
-        uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
-      - name: 🟢 Set up Node.js
-        uses: actions/setup-node@v3
+      - name: Set up Node.js (Backend)
+        uses: actions/setup-node@v2
         with:
-          node-version: 18
+          node-version: '16'  # Use Node.js version 16
 
-      - name: 📦 Install Backend Dependencies
-        run: npm install
+      - name: Install Dependencies (Backend)
+        run: |
+          cd backend
+          npm install
 
-      - name: 📦 Install Frontend Dependencies
-        working-directory: client
-        run: npm install
+      - name: Run Tests (Backend)
+        run: |
+          cd backend
+          npm test  # This assumes you have tests in your backend. If not, remove this line
 
-      - name: ⚙️ Build Frontend
-        working-directory: client
-        run: npm run build
+      - name: Start Backend (Optional, for debugging)
+        run: |
+          cd backend
+          npm run server  # This will start your backend server (not for production, only for testing)
 
-      - name: 🧪 Backend Tests (placeholder)
-        run: echo "No backend tests defined yet."
+  # Job for Frontend
+  frontend:
+    runs-on: macos-latest  # Using macOS as per your local setup
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
-      - name: ✅ Finish
-        run: echo "CI/CD pipeline executed successfully!"
+      - name: Set up Node.js (Frontend)
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'  # Use Node.js version 16
+
+      - name: Install Dependencies (Frontend)
+        run: |
+          cd client
+          npm install
+
+      - name: Run Tests (Frontend)
+        run: |
+          cd client
+          npm test  # This will run frontend tests with React Testing Library
+
+      - name: Build Frontend
+        run: |
+          cd client
+          npm run build  # Builds the React app for production
+
+  # Deployment (Optional)
+  deploy:
+    runs-on: macos-latest  # For deploying locally or to cloud
+    needs: [frontend, backend]  # Ensure both frontend and backend are built first
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Deploy Backend (Optional)
+        run: |
+          cd backend
+          # Here you could deploy to a cloud service, or perform additional deployment steps
+          echo "Deploying Backend..."
+      
+      - name: Deploy Frontend (Optional)
+        run: |
+          cd client
+          # Similarly, deploy the React app to your desired platform
+          echo "Deploying Frontend..."
 
