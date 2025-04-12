@@ -1,56 +1,55 @@
 
-name: Fullstack CI/CD Pipeline
+name: Fullstack CI Pipeline
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
 
     services:
       mongo:
-        image: mongo:5.0
+        image: mongo:latest
         ports:
           - 27017:27017
-        env:
-          MONGO_INITDB_ROOT_USERNAME: root
-          MONGO_INITDB_ROOT_PASSWORD: example
         options: >-
           --health-cmd "mongo --eval 'db.runCommand({ ping: 1 })'"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
 
+    env:
+      MONGO_URI: mongodb://localhost:27017/book-reservation
+      JWT_SECRET: dummy_jwt_secret
+      PORT: 5000
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v3
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
+      - name: 🟢 Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
 
-    - name: Install backend dependencies
-      run: npm install
+      - name: 📦 Install Backend Dependencies
+        run: npm install
 
-    - name: Install frontend dependencies
-      working-directory: ./client
-      run: npm install
+      - name: 📦 Install Frontend Dependencies
+        working-directory: client
+        run: npm install
 
-    - name: Build frontend
-      working-directory: ./client
-      run: npm run build
+      - name: ⚙️ Build Frontend
+        working-directory: client
+        run: npm run build
 
-    - name: Start backend (test only, no real deploy)
-      env:
-        MONGO_URL: mongodb://localhost:27017/testdb
-      run: |
-        echo "Running backend temporarily for test (adjust as needed)"
-        node server.js &
-        sleep 10
-        curl http://localhost:5000 || echo "Test complete"
+      - name: 🧪 Backend Tests (placeholder)
+        run: echo "No backend tests defined yet."
+
+      - name: ✅ Finish
+        run: echo "CI/CD pipeline executed successfully!"
 
