@@ -12,7 +12,7 @@ jobs:
 
     services:
       mongo:
-        image: mongo:6.0
+        image: mongo:5.0
         ports:
           - 27017:27017
         options: >-
@@ -22,36 +22,37 @@ jobs:
           --health-retries 5
 
     env:
-      MONGO_URI: ${{ secrets.MONGO_URI }}
-      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      MONGO_URI: mongodb://localhost:27017/book-reservation
+      JWT_SECRET: dummy_jwt_secret
+      PORT: 5000
+      CI: false  # Avoid treating React warnings as errors
 
     steps:
-    - name: 📥 Checkout code
-      uses: actions/checkout@v3
+      - name: 📥 Checkout code
+        uses: actions/checkout@v3
 
-    - name: 📦 Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: 18
+      - name: 🟢 Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
 
-    # FRONTEND SETUP
-    - name: 📁 Install frontend dependencies
-      working-directory: ./frontend
-      run: npm install
+      - name: 📦 Install backend dependencies
+        working-directory: ./backend
+        run: npm install
 
-    - name: 🧪 Run frontend tests
-      working-directory: ./frontend
-      run: npm test
+      - name: ✅ Run backend tests
+        working-directory: ./backend
+        run: npm test
 
-    - name: 🏗 Build frontend
-      working-directory: ./frontend
-      run: npm run build
+      - name: 📦 Install frontend dependencies
+        working-directory: ./frontend
+        run: npm install
 
-    # BACKEND SETUP
-    - name: 📁 Install backend dependencies
-      working-directory: ./backend
-      run: npm install
+      - name: 🧪 Run frontend tests
+        working-directory: ./frontend
+        run: npm test
 
-    - name: 🧪 Run backend tests
-      working-directory: ./backend
-      run: npm test
+      - name: 🛠️ Build frontend
+        working-directory: ./frontend
+        run: npm run build
+
