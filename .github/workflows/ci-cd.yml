@@ -28,31 +28,31 @@ jobs:
       CI: false  # Avoid treating React warnings as errors
 
     steps:
-      - name: 📥 Checkout code
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: 🟢 Set up Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
 
-      - name: 📦 Install backend dependencies
+      - name: Install backend dependencies
         working-directory: ./backend
         run: npm install
 
-      - name: ✅ Run backend tests
+      - name: Run backend tests
         working-directory: ./backend
         run: npm test
 
-      - name: 📦 Install frontend dependencies
+      - name: Install frontend dependencies
         working-directory: ./frontend
         run: npm install
 
-      - name: 🧪 Run frontend tests
+      - name: Run frontend tests
         working-directory: ./frontend
         run: npm test
 
-      - name: 🛠️ Build frontend
+      - name: Build frontend
         working-directory: ./frontend
         run: npm run build
 
